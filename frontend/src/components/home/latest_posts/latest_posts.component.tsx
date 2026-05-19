@@ -13,8 +13,8 @@ const LatestPostsComponent = () => {
     return <LoadingAnimation />;
   }
   return (
-    <div>
-      <h2 className="text-2xl font-bold text-gray-300 mb-6">Latest Posts</h2>
+    <div className="text-slate-100">
+      <h2 className="text-2xl font-bold text-slate-100 mb-6">Latest Posts</h2>
       <div className="space-y-6">
         {data?.posts?.length ?? 0 > 0 ? (
           data?.posts?.map((post: Post) => (
@@ -63,7 +63,9 @@ const LatestPostsComponent = () => {
             </div>
           ))
         ) : (
-          <div>Post is not available!</div>
+          <div className="rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-5 text-slate-300">
+            Post is not available!
+          </div>
         )}
       </div>
     </div>
