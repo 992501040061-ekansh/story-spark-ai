@@ -42,6 +42,46 @@ const getPasswordError = (password: string) => {
   return "";
 };
 
+type StrengthLevel = "weak" | "medium" | "strong";
+
+const PASSWORD_STRENGTH_CONFIG: Record<
+  StrengthLevel,
+  { label: string; barColor: string; barWidth: string; textColor: string }
+> = {
+  weak: {
+    label: "Weak",
+    barColor: "bg-red-500",
+    barWidth: "w-1/3",
+    textColor: "text-red-400",
+  },
+  medium: {
+    label: "Medium",
+    barColor: "bg-yellow-400",
+    barWidth: "w-2/3",
+    textColor: "text-yellow-300",
+  },
+  strong: {
+    label: "Strong",
+    barColor: "bg-green-500",
+    barWidth: "w-full",
+    textColor: "text-green-400",
+  },
+};
+
+const getStrengthLevel = (passedChecks: number): StrengthLevel => {
+  if (passedChecks <= 2) return "weak";
+  if (passedChecks <= 4) return "medium";
+  return "strong";
+};
+
+const PASSWORD_REQUIREMENTS = [
+  { key: "length" as const, label: "Minimum 8 characters" },
+  { key: "uppercase" as const, label: "One uppercase letter" },
+  { key: "lowercase" as const, label: "One lowercase letter" },
+  { key: "number" as const, label: "One number" },
+  { key: "special" as const, label: "One special character" },
+];
+
 const SignUpComponent = () => {
   const navigate = useNavigate();
   const [emailVerify] = useEmailVerifyMutation();
@@ -72,26 +112,9 @@ const SignUpComponent = () => {
   const passedChecks =
     Object.values(passwordChecks).filter(Boolean).length;
 
-  const passwordStrength =
-    passedChecks <= 2
-      ? "Weak"
-      : passedChecks <= 4
-        ? "Medium"
-        : "Strong";
-
-  const strengthColor =
-    passwordStrength === "Weak"
-      ? "bg-red-500"
-      : passwordStrength === "Medium"
-        ? "bg-yellow-400"
-        : "bg-green-500";
-
-  const strengthWidth =
-    passwordStrength === "Weak"
-      ? "w-1/3"
-      : passwordStrength === "Medium"
-        ? "w-2/3"
-        : "w-full";
+  const strengthLevel = getStrengthLevel(passedChecks);
+  const { label: strengthLabel, barColor, barWidth, textColor } =
+    PASSWORD_STRENGTH_CONFIG[strengthLevel];
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     if (data) {
@@ -183,7 +206,7 @@ const SignUpComponent = () => {
   };
 
   return (
-    <div className="flex-1 bg-slate-900 text-slate-100 flex items-center justify-center relative overflow-hidden px-4 py-8">
+    <div className="min-h-[calc(100dvh-4.5rem)] bg-slate-900 text-slate-100 flex items-center justify-center relative overflow-hidden px-4 py-8">
       <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none" />
@@ -266,75 +289,40 @@ const SignUpComponent = () => {
               />
 
               <div className="space-y-3 -mt-2">
-                <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className="w-full h-2 bg-slate-700 rounded-full overflow-hidden"
+                  role="progressbar"
+                  aria-valuenow={passedChecks}
+                  aria-valuemin={0}
+                  aria-valuemax={PASSWORD_REQUIREMENTS.length}
+                  aria-label="Password strength"
+                >
                   <div
-                    className={`h-full transition-all duration-300 ${strengthColor} ${strengthWidth}`}
+                    className={`h-full transition-all duration-300 ${barColor} ${barWidth}`}
                   ></div>
                 </div>
 
                 <p
-                  className={`text-sm font-medium ${
-                    passwordStrength === "Weak"
-                      ? "text-red-400"
-                      : passwordStrength === "Medium"
-                        ? "text-yellow-300"
-                        : "text-green-400"
-                  }`}
+                  className={`text-sm font-medium ${textColor}`}
+                  aria-live="polite"
                 >
-                  {passwordStrength} Password
+                  {strengthLabel} Password
                 </p>
 
                 <ul className="space-y-1 text-xs">
-                  <li
-                    className={
-                      passwordChecks.length
-                        ? "text-green-400"
-                        : "text-red-400"
-                    }
-                  >
-                    {passwordChecks.length ? "✅" : "❌"} Minimum 8 characters
-                  </li>
-
-                  <li
-                    className={
-                      passwordChecks.uppercase
-                        ? "text-green-400"
-                        : "text-red-400"
-                    }
-                  >
-                    {passwordChecks.uppercase ? "✅" : "❌"} One uppercase
-                    letter
-                  </li>
-
-                  <li
-                    className={
-                      passwordChecks.lowercase
-                        ? "text-green-400"
-                        : "text-red-400"
-                    }
-                  >
-                    {passwordChecks.lowercase ? "✅" : "❌"} One lowercase
-                    letter
-                  </li>
-
-                  <li
-                    className={
-                      passwordChecks.number ? "text-green-400" : "text-red-400"
-                    }
-                  >
-                    {passwordChecks.number ? "✅" : "❌"} One number
-                  </li>
-
-                  <li
-                    className={
-                      passwordChecks.special
-                        ? "text-green-400"
-                        : "text-red-400"
-                    }
-                  >
-                    {passwordChecks.special ? "✅" : "❌"} One special
-                    character
-                  </li>
+                  {PASSWORD_REQUIREMENTS.map(({ key, label }) => {
+                    const met = passwordChecks[key];
+                    return (
+                      <li
+                        key={key}
+                        className={met ? "text-green-400" : "text-red-400"}
+                        aria-label={`${label}: ${met ? "met" : "not met"}`}
+                      >
+                        <span aria-hidden="true">{met ? "✅" : "❌"}</span>{" "}
+                        {label}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
 
