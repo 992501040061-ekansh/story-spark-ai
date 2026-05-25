@@ -1,10 +1,18 @@
 import { z } from "zod";
 
+const passwordSchema = z
+  .string({ required_error: "Password is required" })
+  .min(8, "Password must be at least 8 characters long")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
+
 const register = z.object({
   body: z.object({
     email: z.string({ required_error: "Email is required" }),
     name: z.string({ required_error: "Name is required" }),
-    password: z.string({ required_error: "Password is required" }),
+    password: passwordSchema,
   }),
 });
 
@@ -15,7 +23,28 @@ const login = z.object({
   }),
 });
 
+const updateUser = z.object({
+  body: z.object({
+    name: z.string().optional(),
+    profile: z
+      .object({
+        avatar: z.string().optional(),
+        bio: z.string().optional(),
+        social: z
+          .object({
+            facebook: z.string().optional(),
+            twitter: z.string().optional(),
+            linkedin: z.string().optional(),
+            instagram: z.string().optional(),
+          })
+          .optional(),
+      })
+      .optional(),
+  }).strict(),
+});
+
 export const UserValidator = {
   register,
   login,
+  updateUser,
 };

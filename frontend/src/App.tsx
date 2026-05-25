@@ -1,4 +1,5 @@
-import { JSX, useEffect, useState } from "react";
+import StoryInspirationWrapper from "./components/StoryInspirationWrapper";
+import { JSX } from "react";
 import WritingAssistantComponent from "./components/writing-assistant/writing_assistant.component";
 import CollabHome from "./components/collab/CollabHome";
 import CollabRoom from "./components/collab/CollabRoom";
@@ -8,6 +9,8 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
+
 
 import HeroSectionComponent from "./components/hero/hero_section.component";
 import HomeComponent from "./components/home/home.component";
@@ -31,16 +34,24 @@ import EmailValidationComponent from "./components/email_validation/email.valida
 import { USER_ROLE } from "./constants/role";
 import PostListsComponent from "./components/dashboard/posts/post_lists.component";
 import ProfileComponent from "./components/dashboard/profile/profile.component";
+import PaymentComponent from "./components/home/pricing/payment.component";
+import Contact from "./components/contactus/contactus";
 import HelpCenterComponent from "./components/help_center/help_center.component";
-
 import AboutUsComponent from "./components/footer/about-us.tsx";
 import CareerComponent from "./components/footer/career.tsx";
-import ContactUsComponent from "./components/footer/contact-us.tsx";
+// import ContactUsComponent from "./components/footer/contact-us.tsx";
 import BlogComponent from "./components/footer/blog.tsx";
+import PrivacyPolicy from "./components/footer/Privacy.tsx";
+import Terms from "./components/footer/terms.tsx";
 // import HelpCenterComponent from "./components/footer/help-center.tsx";
 import GuidelinesComponent from "./components/footer/guidelines.tsx";
 import TemplatesComponent from "./components/templates/templates.component";
 import CommunityComponent from "./components/community/community.component";
+import ResourcesListComponent from "./components/community/resources_list.component";
+import ResourceDetailComponent from "./components/community/resource_detail.component";
+import MagicCursorComponent from "./components/magic-cursor/magic_cursor.component";
+import ContributorsComponent from "./components/footer/contributors";
+
 const ProtectedRoute = ({
   element,
   allowedRoles,
@@ -50,31 +61,19 @@ const ProtectedRoute = ({
 }) => {
   const user = getUserInfo();
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
   if (!allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/" />;
   }
   return element;
 };
 
 function App() {
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("theme") === "dark",
-  );
-
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
-
   return (
     <Router>
+      <MagicCursorComponent />
+      <ScrollToTop />
       {/* Dark Mode Toggle Button */}
       {/* <div className="fixed top-4 right-4 z-50">
         <button
@@ -112,11 +111,20 @@ function App() {
           }
         />
         <Route
+          path="/story-inspiration"
+          element={
+            <RootLayout>
+              <StoryInspirationWrapper />
+            </RootLayout>
+          }
+        />
+
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute
               element={<DashboardLayout />}
-              allowedRoles={[USER_ROLE.ADMIN, USER_ROLE.SUPER_ADMIN]}
+              allowedRoles={[USER_ROLE.ADMIN]}
             />
           }
         >
@@ -216,8 +224,8 @@ function App() {
               />
             }
           />
-        </Route>
 
+        </Route>
         <Route
           path="/stories"
           element={
@@ -239,7 +247,7 @@ function App() {
           path="/auth/email-validation"
           element={<EmailValidationComponent />}
         />
-
+        <Route path="/payment" element={<PaymentComponent />} />
         <Route
           path="/signup"
           element={
@@ -259,9 +267,19 @@ function App() {
         <Route
           path="/explore"
           element={
-            <RootLayout>
-              <ExploreComponent />
-            </RootLayout>
+            <ProtectedRoute
+              element={
+                <RootLayout>
+                  <ExploreComponent />
+                </RootLayout>
+              }
+              allowedRoles={[
+                USER_ROLE.USER,
+                USER_ROLE.WRITER,
+                USER_ROLE.ADMIN,
+                USER_ROLE.SUPER_ADMIN,
+              ]}
+            />
           }
         />
         <Route
@@ -291,15 +309,6 @@ function App() {
           }
         />
         <Route
-          path="/community"
-          element={
-            <RootLayout>
-              <CommunityComponent />
-            </RootLayout>
-          }
-        />
-
-        <Route
           path="/post/:id"
           element={
             <RootLayout>
@@ -326,9 +335,19 @@ function App() {
         <Route
           path="/contact-us"
           element={
-            <RootLayout>
-              <ContactUsComponent />
-            </RootLayout>
+            <ProtectedRoute
+              element={
+                <RootLayout>
+                  <Contact />
+                </RootLayout>
+              }
+              allowedRoles={[
+                USER_ROLE.USER,
+                USER_ROLE.WRITER,
+                USER_ROLE.ADMIN,
+                USER_ROLE.SUPER_ADMIN,
+              ]}
+            />
           }
         />
         <Route
@@ -336,6 +355,22 @@ function App() {
           element={
             <RootLayout>
               <BlogComponent />
+            </RootLayout>
+          }
+        />
+              <Route
+        path="/privacy-policy"
+        element={
+          <RootLayout>
+            <PrivacyPolicy />
+          </RootLayout>
+        }
+      />
+        <Route
+          path="/terms"
+          element={
+            <RootLayout>
+              <Terms />
             </RootLayout>
           }
         />
@@ -358,8 +393,62 @@ function App() {
         <Route
           path="/community"
           element={
+            <ProtectedRoute
+              element={
+                <RootLayout>
+                  <CommunityComponent />
+                </RootLayout>
+              }
+              allowedRoles={[
+                USER_ROLE.USER,
+                USER_ROLE.WRITER,
+                USER_ROLE.ADMIN,
+                USER_ROLE.SUPER_ADMIN,
+              ]}
+            />
+          }
+        />
+        <Route
+          path="/resources"
+          element={
+            <ProtectedRoute
+              element={
+                <RootLayout>
+                  <ResourcesListComponent />
+                </RootLayout>
+              }
+              allowedRoles={[
+                USER_ROLE.USER,
+                USER_ROLE.WRITER,
+                USER_ROLE.ADMIN,
+                USER_ROLE.SUPER_ADMIN,
+              ]}
+            />
+          }
+        />
+        <Route
+          path="/resources/:resourceName"
+          element={
+            <ProtectedRoute
+              element={
+                <RootLayout>
+                  <ResourceDetailComponent />
+                </RootLayout>
+              }
+              allowedRoles={[
+                USER_ROLE.USER,
+                USER_ROLE.WRITER,
+                USER_ROLE.ADMIN,
+                USER_ROLE.SUPER_ADMIN,
+              ]}
+            />
+          }
+        />
+        <Route
+          path="/contributors"
+          element={
             <RootLayout>
-              <CommunityComponent />
+              <ContributorsComponent />
             </RootLayout>
           }
         />
