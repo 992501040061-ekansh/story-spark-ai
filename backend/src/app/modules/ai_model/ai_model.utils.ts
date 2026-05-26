@@ -7,6 +7,8 @@ import { fetchImageURL } from "../../../utils/image_generation";
 import config from "../../../config";
 import { v4 as uuidv4 } from "uuid";
 import { IAlternateEnding } from "./ai_model.interface";
+import ApiError from "../../../errors/api_error";
+import httpStatus from "http-status";
 
 const genAI = new GoogleGenerativeAI(config.gemini_api_key as string);
 
@@ -66,8 +68,11 @@ export async function generateWithGeminiStories(
       imageURL: imageResults[index].imageUrl,
       uuid: uuidv4(),
     }));
-  } catch (error) {
-    return [];
+  } catch (error: any) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      `AI generation failed: ${error?.message || error}`
+    );
   }
 }
 
@@ -104,9 +109,11 @@ export async function generateAlternateEndingsWithGemini(
     );
     const text = response.response.text();
     return JSON.parse(text);
-  } catch (error) {
-    console.error("Error generating alternate endings with Gemini:", error);
-    return [];
+  } catch (error: any) {
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      `AI generation of alternate endings failed: ${error?.message || error}`
+    );
   }
 }
 
