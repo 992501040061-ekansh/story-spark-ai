@@ -1,16 +1,66 @@
 import express from "express";
-import { postController } from "./post.controller";
+import { PostController } from "./post.controller";
 import { protect } from "../../middlewares/auth.middleware"; 
-// FIXED: Imported the centralized request limit validation middleware
 import { checkRequestLimit } from "../../middlewares/quota.middleware"; 
 
 const router = express.Router();
 
 /* ============================================================
-   PATCHED MODULE ROUTES — GSSoC '26 RESOURCE MANAGEMENT
+   SYSTEM LAYOUT CONFIGURATIONS & CORE INBOUND PUBLIC ENTRIES
    ============================================================ */
 
-// ... your alternate standard post routes (get, delete, update) ...
+router.post(
+  "/create-post",
+  protect,
+  PostController.createPost
+);
+
+router.get(
+  "/",
+  PostController.getPosts
+);
+
+router.get(
+  "/latest-posts",
+  PostController.getLatestPosts
+);
+
+router.get(
+  "/featured-posts",
+  PostController.getFeaturedPosts
+);
+
+router.patch(
+  "/featured/:postId",
+  protect,
+  PostController.doFeaturedPosts
+);
+
+router.get(
+  "/:id",
+  PostController.getSinglePost
+);
+
+router.get(
+  "/tag/:tag",
+  PostController.getPostsByTag
+);
+
+router.patch(
+  "/bookmark/:id",
+  protect,
+  PostController.toggleBookmark
+);
+
+router.delete(
+  "/:id",
+  protect,
+  PostController.deletePost
+);
+
+/* ============================================================
+   PATCHED MODULE ROUTES — GSSoC '26 RESOURCE MANAGEMENT
+   ============================================================ */
 
 /**
  * @route   POST /api/v1/post/remix
@@ -20,20 +70,20 @@ const router = express.Router();
 router.post(
   "/remix",
   protect,
-  checkRequestLimit, // <-- FIXED: Blocks requests here if user exceeded monthly quota
-  postController.remixStory
+  checkRequestLimit, // <-- FIXED: Intercepts request if user exceeded monthly quota balance
+  PostController.remixStory
 );
 
 /**
  * @route   POST /api/v1/post/translate
- * @desc    Translate generated story variations into alternative languages
+ * @desc    Translate generated story variations across languages
  * @access  Private (Quota Monitored)
  */
 router.post(
   "/translate",
   protect,
-  checkRequestLimit, // <-- FIXED: Blocks requests here if user exceeded monthly quota
-  postController.translateStory
+  checkRequestLimit, // <-- FIXED: Intercepts request if user exceeded monthly quota balance
+  PostController.translateStory
 );
 
 export const PostRouter = router;
