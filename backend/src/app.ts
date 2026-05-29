@@ -39,10 +39,10 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Cookie"], 
   })
 );
-app.use("/review", storyRoutes);
-app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // Keeps your extended payload parsing enabled
-app.use(cookieParser());
+app.use("/review", storyRoutes as any);
+app.use(express.json() as any);
+app.use(express.urlencoded({ extended: true }) as any); // Keeps your extended payload parsing enabled
+app.use(cookieParser() as any);
 
 // Routes
 app.use("/api/v1", Routers);
