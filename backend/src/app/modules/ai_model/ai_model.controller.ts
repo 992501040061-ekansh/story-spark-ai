@@ -12,6 +12,7 @@ import {
   createGuestQuotaGuard,
   runWithQuotaCleanup,
 } from "./quota.lifecycle";
+import { generateWithGeminiStoriesStream } from "./ai_model.utils";
 
 const aiModelGenerate = catchAsync(async (req: Request, res: Response) => {
   const prompt = req.body;
@@ -105,6 +106,38 @@ const aiFreeModelAlternateEndings = catchAsync(
   }
 );
 
+const aiModelGenerateStream = async (req: Request, res: Response) => {
+  const { prompt, wordLength, numStories } = req.body;
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.flushHeaders();
+
+  const controller = new AbortController();
+
+  req.on("close", () => {
+    controller.abort();
+  });
+
+  try {
+    await generateWithGeminiStoriesStream(
+      prompt,
+      wordLength ?? 250,
+      numStories ?? 2,
+      (chunk: string) => {
+        res.write(`data: ${JSON.stringify({ chunk })}\n\n`);
+      },
+      controller.signal
+    );
+    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    res.end();
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    res.write(`data: ${JSON.stringify({ error: errorMsg })}\n\n`);
+    res.end();
+  }
+};
 const aiModelRemix = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body as IRemixPayload;
   const token = await getToken(req);
@@ -156,6 +189,7 @@ export const AiModelController = {
   aiFreeModelGenerate,
   aiModelAlternateEndings,
   aiFreeModelAlternateEndings,
+  aiModelGenerateStream,
   aiModelRemix,
   aiFreeModelRemix,
   aiModelTranslate,
