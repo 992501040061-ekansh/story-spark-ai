@@ -409,6 +409,73 @@ Write the remixed story in ${language}. Return a JSON object with this exact str
   }
 }
 
+export async function generateStoryContinuationWithGemini(
+  storyContext: string,
+  language: string = "English",
+  signal?: AbortSignal
+): Promise<{ continuation: string }> {
+  throwIfAborted(signal);
+  assertGeminiApiKeyConfigured();
+
+  try {
+    const chatSession = model.startChat({
+      generationConfig: {
+        ...generationConfig,
+        maxOutputTokens: 2048,
+      },
+      safetySettings,
+      history: [],
+    });
+
+    const response = await chatSession.sendMessage(
+      `You are an expert storyteller. The user has written the following story so far:
+
+"${storyContext}"
+
+Continue this story naturally with 2-4 paragraphs that maintain the same tone, style, and narrative direction. The continuation MUST be written entirely in ${language}.
+
+Return only valid JSON with this exact structure:
+{
+  "continuation": "your continuation text here"
+}`
+    );
+
+    throwIfAborted(signal);
+
+    const text = response.response.text();
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(sanitizeJsonText(text));
+    } catch (parseError: unknown) {
+      const parseErrorMsg = parseError instanceof Error ? parseError.message : String(parseError);
+      throw new ApiError(
+        httpStatus.BAD_GATEWAY,
+        `Invalid AI response: failed to parse JSON (${parseErrorMsg})`
+      );
+    }
+
+    if (!parsed.continuation || typeof parsed.continuation !== "string") {
+      throw new ApiError(
+        httpStatus.BAD_GATEWAY,
+        "Invalid AI response: Expected a continuation string."
+      );
+    }
+
+    return { continuation: parsed.continuation };
+  } catch (error: unknown) {
+    if (error instanceof ApiError || error instanceof GenerationAbortedError) {
+      throw error;
+    }
+
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    throw new ApiError(
+      httpStatus.BAD_GATEWAY,
+      `AI story continuation failed: ${errorMsg}`
+    );
+  }
+}
+
 export async function translateStoryWithGemini(
   title: string,
   content: string,
@@ -453,6 +520,33 @@ Preserve the story's tone, style and meaning. Only translate — do not modify t
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR,
       `AI translation failed: ${errorMsg}`
+    );
+  }
+}
+
+export async function chatWithGemini(
+  message: string,
+  history: { role: string; parts: { text: string }[] }[] = []
+): Promise<string> {
+  assertGeminiApiKeyConfigured();
+
+  try {
+    const chatSession = model.startChat({
+      generationConfig: {
+        ...generationConfig,
+        responseMimeType: "text/plain",
+      },
+      safetySettings,
+      history,
+    });
+
+    const result = await chatSession.sendMessage(message);
+    return result.response.text();
+  } catch (error: unknown) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      `AI chat failed: ${errorMsg}`
     );
   }
 }
