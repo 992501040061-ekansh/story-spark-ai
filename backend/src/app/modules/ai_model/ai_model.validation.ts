@@ -43,10 +43,16 @@ const aiStoryContinuation = z.object({
 
 const aiAlternateEndings = z.object({
   body: z.object({
-    title: z.string({ required_error: "Title is required!" }),
-    content: z.string({ required_error: "Content is required!" }),
-    tag: z.string({ required_error: "Tag is required!" }),
-    language: z.string().optional(),
+    title: z
+      .string({ required_error: "Title is required!" })
+      .max(200, "Title must not exceed 200 characters"),
+    content: z
+      .string({ required_error: "Content is required!" })
+      .max(10000, "Content must not exceed 10000 characters"),
+    tag: z
+      .string({ required_error: "Tag is required!" })
+      .max(50, "Tag must not exceed 50 characters"),
+    language: z.string().max(50).optional(),
   }),
 });
 
