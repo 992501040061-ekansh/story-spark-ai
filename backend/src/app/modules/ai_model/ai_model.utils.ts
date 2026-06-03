@@ -4,6 +4,7 @@ import {
   HarmBlockThreshold,
 } from "@google/generative-ai";
 import { fetchImageURL } from "../../../utils/image_generation";
+import { generateStoryboardImage } from "../../../utils/storyboard_image_generation";
 import { GenerationAbortedError } from "../../../utils/generation_timeout";
 import config from "../../../config";
 import { v4 as uuidv4 } from "uuid";
@@ -183,13 +184,29 @@ export async function generateWithGeminiStories(
         return "";
       }
     });
+
+    // Fetch cover images for stories concurrently (using generateStoryboardImage or fetchImageURL fallback)
+    const coverImagePromises = stories.map(async (story) => {
+      try {
+        const generated = await generateStoryboardImage(`Cover illustration for a book titled: ${story?.title}. Theme: ${story?.tag}. Style: cinematic, detailed`);
+        if (generated) return generated;
+        const imageResponse = await fetchImageURL(String(story?.title ?? story?.tag ?? ""));
+        return imageResponse?.imageUrl || "";
+      } catch (e) {
+        return "";
+      }
+    });
     
-    const imageUrls = await Promise.all(imagePromises);
+    const [imageUrls, coverImages] = await Promise.all([
+      Promise.all(imagePromises),
+      Promise.all(coverImagePromises),
+    ]);
 
     return stories.map((story, index) => ({
       ...story,
       language,
       imageURL: imageUrls[index],
+      coverImage: coverImages[index],
       uuid: uuidv4(),
     }));
   } catch (error: unknown) {

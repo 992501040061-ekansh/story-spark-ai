@@ -202,6 +202,7 @@ export interface IStories {
   tag: string;
   imageURL: string;
   language?: string;
+  coverImage?: string;
 }
 
 interface IPost extends IStories {
@@ -1772,6 +1773,16 @@ if (isLoading) {
               </div>
             )}
 
+            {selectedStory.coverImage && (
+              <div className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden mb-6 relative group select-none">
+                <img
+                  src={selectedStory.coverImage}
+                  alt={selectedStory.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            )}
+
             <div id="story-content" className="prose prose-invert max-w-none text-slate-300 leading-relaxed tracking-wide relative z-10">
               <p className="break-words whitespace-pre-wrap">
                 {sentenceSegments.length > 0 ? (
@@ -1818,6 +1829,16 @@ if (isLoading) {
                   <i className="fas fa-wand-magic-sparkles"></i> AI Enhanced Prompt
                 </h4>
                 <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm italic break-words whitespace-pre-wrap m-0 leading-relaxed font-medium">{selectedStory.enhancedPrompt}</p>
+              </div>
+            )}
+
+            {selectedStory.coverImage && (
+              <div className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden mb-6 relative group select-none">
+                <img
+                  src={selectedStory.coverImage}
+                  alt={selectedStory.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
               </div>
             )}
 
