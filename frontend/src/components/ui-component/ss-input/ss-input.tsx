@@ -45,10 +45,10 @@ const SSInput = <T extends FieldValues>({
 
   return (
     <div className="w-full min-w-0">
-      <label htmlFor={name} className="block text-sm font-medium text-gray-600 dark:text-gray-400">
+      <label htmlFor={name} className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5">
         {label}
       </label>
-      <div className="relative mt-2 w-full min-w-0">
+      <div className="relative w-full min-w-0">
         {icon && (
           <span className="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center text-gray-500 pointer-events-none">
             <i className={icon}></i>
@@ -58,10 +58,10 @@ const SSInput = <T extends FieldValues>({
        <input
   type={inputType}
   id={name}
-  className={`w-full box-border pl-6 sm:pl-8 pr-8 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base text-gray-900 dark:text-gray-200 bg-white dark:bg-slate-800 transition-all duration-200 ${
+  className={`w-full box-border pl-8 sm:pl-10 pr-8 sm:pr-10 py-2 sm:py-2.5 text-sm sm:text-base text-gray-900 dark:text-gray-200 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-xl transition-all duration-200 ${
     error
       ? "border-2 border-red-500"
-      : "focus:ring-2 focus:ring-indigo-500/20 focus:outline-none"
+      : "focus:ring-2 focus:ring-indigo-500/20 focus:outline-none focus:border-indigo-500"
   }`}
   placeholder={placeholder}
   autoComplete={autoComplete}
