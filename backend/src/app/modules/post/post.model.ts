@@ -31,7 +31,7 @@ export const PostSchema: Schema<IPost> = new Schema<IPost, PostModel>(
     attachments: [{ type: String }],
     comments: [{ type: Schema.Types.ObjectId, ref: "Comment" }],
     reactions: [{ type: Schema.Types.ObjectId, ref: "Reaction" }],
-    bookmarks: [{ type: Schema.Types.ObjectId, ref: "User", default: [] }],
+    bookmarksCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,

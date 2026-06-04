@@ -125,7 +125,6 @@ const getPosts = async (
       path: "reactions",
       populate: { path: "userId", select: "email" },
     })
-    .populate("bookmarks", "email");
   const total = await Post.countDocuments(whereCondition);
   return {
     meta: {
@@ -147,7 +146,6 @@ const getLatestPosts = async () => {
         path: "reactions",
         populate: { path: "userId", select: "email" },
       })
-      .populate("bookmarks", "email");
     return res;
   } catch (error) {
     throw new ApiError(
@@ -170,7 +168,6 @@ const getFeaturedPosts = async () => {
         path: "reactions",
         populate: { path: "userId", select: "email" },
       })
-      .populate("bookmarks", "email");
     return res;
   } catch (error) {
     throw new ApiError(
@@ -203,7 +200,6 @@ const getSinglePost = async (id: string) => {
       path: "reactions",
       populate: { path: "userId", select: "email" },
     })
-    .populate("bookmarks", "email");
   if (!postById) {
     throw new ApiError(httpStatus.NOT_FOUND, "Post not found!");
   }
@@ -222,7 +218,6 @@ const getPostsByTag = async (tag: string, excludeId?: string) => {
       path: "reactions",
       populate: { path: "userId", select: "email" },
     })
-    .populate("bookmarks", "email");
   return result;
 };
 
@@ -232,29 +227,27 @@ const toggleBookmark = async (postId: string, token: ITokenPayload) => {
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User not found!");
   }
- const post = await Post.findOne({ _id: postId, isDeleted: { $ne: true } });
+  const post = await Post.findOne({ _id: postId, isDeleted: { $ne: true } });
   if (!post) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Post not found!");
   }
-  // Check bookmark status atomically via a DB query instead of loading the full document
-  const isBookmarked = await Post.exists({ _id: postId, bookmarks: user._id });
 
-  if (isBookmarked) {
-    // Remove bookmark atomically
-    await Post.updateOne(
-      { _id: postId },
-      { $pull: { bookmarks: user._id } }
-    );
+  const { Bookmark } = await import("../bookmark/bookmark.model");
+  const existingBookmark = await Bookmark.findOne({
+    userId: user._id,
+    storyId: post._id,
+  });
+
+  if (existingBookmark) {
+    await Bookmark.findByIdAndDelete(existingBookmark._id);
+    await Post.findByIdAndUpdate(postId, { $inc: { bookmarksCount: -1 } });
     return { message: "Bookmark removed", bookmarked: false };
   } else {
-    // Add bookmark atomically — $addToSet prevents duplicates
-    await Post.updateOne(
-      { _id: postId },
-      { $addToSet: { bookmarks: user._id } }
-    );
+    await Bookmark.create({ userId: user._id, storyId: post._id });
+    await Post.findByIdAndUpdate(postId, { $inc: { bookmarksCount: 1 } });
     return { message: "Bookmark added", bookmarked: true };
   }
-}
+};
 
 const updatePost = async (
   postId: string,
