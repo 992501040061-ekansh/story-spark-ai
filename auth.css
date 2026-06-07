@@ -99,6 +99,7 @@ body {
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
 }
 
+
 .auth-tab-active {
     color: #d0bcff;
     border-bottom: 2px solid #d0bcff;
