@@ -6,6 +6,7 @@ import sendResponse from "../../../shared/send_response";
 import { getToken } from "../../middleware/token";
 import catchAsync from "../../../shared/catch_async";
 import ApiError from "../../../errors/api_error";
+import { ITokenPayload } from "../../../interfaces/token";
 
 const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -63,7 +64,19 @@ const updateUser = async (req: Request, res: Response) => {
 };
 
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
+  const token = req.user as ITokenPayload;
   const id = routeParam(req.params.id);
+
+  if (
+    token.role !== "admin" &&
+    token.role !== "super_admin" &&
+    token._id !== id
+  ) {
+    throw new ApiError(
+      httpStatus.FORBIDDEN,
+      "You can only delete your own account!"
+    );
+  }
 
   await UserService.deleteUser(id);
 
