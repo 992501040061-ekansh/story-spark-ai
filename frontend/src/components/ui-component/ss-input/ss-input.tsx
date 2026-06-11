@@ -44,7 +44,7 @@ const SSInput = <T extends FieldValues>({
 
 
   return (
-    <div className="w-full min-w-0">
+    <div className="w-[80%] min-w-0">
       <label htmlFor={name} className="block text-sm font-medium text-gray-600 dark:text-gray-400">
         {label}
       </label>
