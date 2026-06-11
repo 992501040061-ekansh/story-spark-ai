@@ -255,7 +255,7 @@ const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
                 </>
               ) : null}
             </div>
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(140px,160px)_minmax(160px,1fr)_minmax(160px,1fr)_minmax(200px,1fr)] lg:items-end">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(160px,190px)_minmax(0,1fr)_minmax(220px,1fr)] xl:items-end">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm text-slate-600 dark:text-slate-400">
                   <span>Progress</span>
