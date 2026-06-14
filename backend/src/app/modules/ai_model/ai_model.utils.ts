@@ -156,19 +156,19 @@ const executeWithRetryAndFallback = async <T>(
       if (signal?.aborted || error instanceof GenerationAbortedError || error?.name === 'AbortError') {
         throw new GenerationAbortedError();
       }
-      
+
       const status = error?.status || error?.response?.status;
       const isRetryable = status >= 500 || status === 429 || error?.message?.includes("fetch failed");
-      
+
       if (!isRetryable || attempt === maxRetries) {
         break; // Break to try fallback
       }
-      
+
       const delay = baseDelayMs * Math.pow(2, attempt - 1);
       await new Promise(res => setTimeout(res, delay));
     }
   }
-  
+
   // Fallback to the smaller model
   try {
     throwIfAborted(signal);
@@ -259,7 +259,7 @@ export async function generateWithGeminiStories(
         coverImages.push("");
       }
     }
-    
+
     const imageUrls = await Promise.all(imagePromises);
 
     return stories.map((story, index) => ({

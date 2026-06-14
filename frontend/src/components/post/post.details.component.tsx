@@ -72,15 +72,15 @@ const PostDetailsComponent = () => {
       skip: !tag,
     }
   );
-  
+
 
   console.log("Current Post:", post);
   console.log("Tag:", tag);
   console.log(
-  "Related Posts Full Data:",
-  JSON.stringify(relatedPost, null, 2)
-);
-  
+    "Related Posts Full Data:",
+    JSON.stringify(relatedPost, null, 2)
+  );
+
   const [toggleReaction] = useToggleReactionMutation();
   const [deletePost, { isLoading: isDeleting }] = useDeletePostMutation();
   const currentUser = getUserInfo();
@@ -101,17 +101,17 @@ const PostDetailsComponent = () => {
   const isFollowing = followData?.isFollowing ?? false;
 
   useEffect(() => {
-  const updateProgress = () => {
-    const article = articleRef.current;
-    if (!article) return;
-    const { top, height } = article.getBoundingClientRect();
-    const windowHeight = window.innerHeight;
-    const scrolled = Math.max(0, -top);
-    const total = Math.max(1, height - windowHeight);
-    setReadingProgress(Math.min(100, (scrolled / total) * 100));
-  };
-  window.addEventListener("scroll", updateProgress, { passive: true });
-  return () => window.removeEventListener("scroll", updateProgress);
+    const updateProgress = () => {
+      const article = articleRef.current;
+      if (!article) return;
+      const { top, height } = article.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const scrolled = Math.max(0, -top);
+      const total = Math.max(1, height - windowHeight);
+      setReadingProgress(Math.min(100, (scrolled / total) * 100));
+    };
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    return () => window.removeEventListener("scroll", updateProgress);
   }, []);
 
   // New Version Timeline and Editor States
@@ -140,7 +140,7 @@ const PostDetailsComponent = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const { data: storyTree } = useGetStoryTreeQuery(id || "", { skip: !id || !showTree,});
+  const { data: storyTree } = useGetStoryTreeQuery(id || "", { skip: !id || !showTree, });
 
   const [createBranchVersion] = useCreateBranchVersionMutation();
 
@@ -211,24 +211,25 @@ const PostDetailsComponent = () => {
     }
   };
 
-  const handleCreateBranch = async (versionId: string) => {const branchName = window.prompt("Enter a branch name");
+  const handleCreateBranch = async (versionId: string) => {
+    const branchName = window.prompt("Enter a branch name");
 
-  if (!branchName?.trim()) {
-    return;
-  }
+    if (!branchName?.trim()) {
+      return;
+    }
 
-  try {
-    await createBranchVersion({versionId, branchName,}).unwrap();
+    try {
+      await createBranchVersion({ versionId, branchName, }).unwrap();
 
-    toast.success("Branch created successfully!");
-  } catch (error) {
-    console.error(error);
+      toast.success("Branch created successfully!");
+    } catch (error) {
+      console.error(error);
 
-    toast.error(
-      "Failed to create branch"
-    );
-  }
-};
+      toast.error(
+        "Failed to create branch"
+      );
+    }
+  };
 
   const hasUserReacted = post?.reactions?.some((r) => {
     const userId = r.userId;
@@ -348,11 +349,10 @@ const PostDetailsComponent = () => {
                 {currentUser && !isOwner && (
                   <button
                     onClick={handleFollow}
-                    className={`rounded px-4 py-1 text-sm cursor-pointer transition-all ${
-                      isFollowing
+                    className={`rounded px-4 py-1 text-sm cursor-pointer transition-all ${isFollowing
                         ? "bg-blue-500/50 text-white hover:bg-red-500/30"
                         : "bg-blue-500/30 text-slate-900 dark:text-gray-300 hover:bg-blue-500/40"
-                    }`}
+                      }`}
                   >
                     {isFollowing ? "Following" : "Follow"}
                   </button>
@@ -469,11 +469,10 @@ const PostDetailsComponent = () => {
               <div className="flex items-center space-x-6">
                 <button
                   onClick={handleLike}
-                  className={`flex items-center space-x-2 transition-colors cursor-pointer ${
-                    hasUserReacted
+                  className={`flex items-center space-x-2 transition-colors cursor-pointer ${hasUserReacted
                       ? "text-red-500 hover:text-red-400"
                       : "text-slate-600 hover:text-slate-900 dark:text-gray-600 dark:hover:text-gray-400"
-                  }`}
+                    }`}
                 >
                   <i
                     className={`${hasUserReacted ? "fas" : "far"} fa-heart`}
@@ -492,7 +491,7 @@ const PostDetailsComponent = () => {
 
               <div className="flex items-center space-x-3 bg-slate-800/40 backdrop-blur-md px-4 py-2 rounded-full border border-slate-700/50 shadow-sm">
                 <span className="text-xs font-semibold uppercase tracking-wider text-slate-700 mr-1 select-none">
-                Share:
+                  Share:
                 </span>
 
                 <button
@@ -548,7 +547,7 @@ const PostDetailsComponent = () => {
       {showTimeline && (
         <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-[#0f172a]/95 backdrop-blur-xl border-l border-slate-700/60 shadow-2xl p-6 overflow-y-auto text-white animate-slide-in flex flex-col">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
-            
+
             <button
               onClick={() => setShowTimeline(false)}
               className="w-8 h-8 rounded-full bg-slate-850 border border-slate-750 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-all cursor-pointer"

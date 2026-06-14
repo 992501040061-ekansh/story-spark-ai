@@ -98,7 +98,7 @@ const StoriesViewComponent: React.FC<StoriesComponentProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [showWorldMap, setShowWorldMap] = useState<boolean>(false);
-const [, setShowRemix] = useState<boolean>(false);
+  const [, setShowRemix] = useState<boolean>(false);
   const [createPost] = useCreatePostMutation();
   const [deletePost] = useDeletePostMutation();
   const { data: profile } = useGetProfileInfoQuery(undefined, { skip: !isLogin });
@@ -156,11 +156,11 @@ const [, setShowRemix] = useState<boolean>(false);
         language: selectedStory.language || "English",
 
       };
-      
+
       const generationRequest = isLogin
         ? generateAlternateEndings(payload)
         : generateFreeAlternateEndings(payload);
-        
+
       const res = await generationRequest.unwrap();
       if (res && res.data) {
         setEndingsCache((prev) => ({
@@ -234,7 +234,7 @@ const [, setShowRemix] = useState<boolean>(false);
       window.speechSynthesis.cancel();
       const cleanContent = selectedStory.content.replace(/<[^>]*>/g, "");
       const utterance = new SpeechSynthesisUtterance(cleanContent);
-      
+
       utterance.onend = () => {
         setIsPlayingAudio(false);
         setIsPausedAudio(false);
@@ -424,7 +424,7 @@ const [, setShowRemix] = useState<boolean>(false);
 
   const handleExportPDF = async () => {
     if (!selectedStory) { toast.error("No story available to export."); return; }
-    if (!selectedStory.content?.trim()) {toast.error("Story content is empty. Cannot export.");return;}
+    if (!selectedStory.content?.trim()) { toast.error("Story content is empty. Cannot export."); return; }
     const toastId = toast.loading("Preparing your premium PDF...");
 
     try {
@@ -647,22 +647,22 @@ const [, setShowRemix] = useState<boolean>(false);
   };
 
   const downloadBlob = (blob: Blob, filename: string) => {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-};
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
-const getSafeFileName = (title: string, ext: string) => {
-  const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  return `${cleanTitle || "story"}.${ext}`;
-};
+  const getSafeFileName = (title: string, ext: string) => {
+    const cleanTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    return `${cleanTitle || "story"}.${ext}`;
+  };
 
-const handleExportMarkdown = () => {
+  const handleExportMarkdown = () => {
     if (!selectedStory) { toast.error("No story available to export."); return; }
-    if (!selectedStory.content?.trim()) {toast.error("Story content is empty. Cannot export.");return;}
+    if (!selectedStory.content?.trim()) { toast.error("Story content is empty. Cannot export."); return; }
     try {
       const title = selectedStory.title || "Story";
       const content = selectedStory.content || "";
@@ -724,13 +724,13 @@ const handleExportMarkdown = () => {
   const isNarrationActive = narrationState !== "idle";
 
 
-if (isLoading) {
-  return (
-    <div className="flex items-center justify-center py-20">
-      <StoryGeneratingAnimation />
-    </div>
-  );
-}
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <StoryGeneratingAnimation />
+      </div>
+    );
+  }
   if (!selectedStory) {
     return null;
   }
@@ -775,11 +775,10 @@ if (isLoading) {
                   stories.map((story) => (
                     <button
                       key={story.uuid}
-                      className={`relative w-16 h-16 rounded-full border-2 ${
-                        selectedStory?.uuid === story.uuid
+                      className={`relative w-16 h-16 rounded-full border-2 ${selectedStory?.uuid === story.uuid
                           ? "border-blue-500 scale-110"
                           : "border-white"
-                      } hover:scale-110 transition-transform duration-200 focus:outline-none`}
+                        } hover:scale-110 transition-transform duration-200 focus:outline-none`}
                       onClick={() => handelStorySelection(story)}
                     >
                       <img
@@ -797,7 +796,7 @@ if (isLoading) {
           <div className="bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 p-8 rounded-2xl shadow-2xl relative overflow-hidden">
             <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div className="absolute bottom-[-50px] left-[-50px] w-48 h-48 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <h3 className="text-xl font-bold text-slate-200 relative z-10">
                 Generated Story
@@ -846,9 +845,8 @@ if (isLoading) {
                 <button
                   type="button"
                   id="publish-story-btn"
-                  className={`rounded-lg px-5 py-2 font-semibold flex items-center space-x-2 cursor-pointer bg-blue-600 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    loading ? "" : "hover:bg-blue-500 hover:shadow-lg active:scale-95"
-                  }`}
+                  className={`rounded-lg px-5 py-2 font-semibold flex items-center space-x-2 cursor-pointer bg-blue-600 text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${loading ? "" : "hover:bg-blue-500 hover:shadow-lg active:scale-95"
+                    }`}
                   onClick={handelPublishStory}
                   disabled={loading || !selectedStory}
                 >
@@ -1036,7 +1034,7 @@ if (isLoading) {
             {selectedStory && (
               <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-2xl shadow-xl p-6 mt-8 relative overflow-hidden">
                 <div className="absolute top-[-50px] right-[-50px] w-48 h-48 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
-                
+
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                   <div>
                     <h3 className="text-xl font-bold text-slate-200 flex items-center gap-2">
@@ -1078,17 +1076,16 @@ if (isLoading) {
                         const hasEndings = endingsCache[selectedStory.uuid] || [];
                         const endingData = hasEndings.find((e) => e.style === s.name);
                         const isApplied = endingData && selectedStory.content === endingData.fullStory;
-                        
+
                         return (
                           <button
                             key={s.name}
                             type="button"
                             onClick={() => setActiveEndingTab(s.name)}
-                            className={`px-5 py-3 font-semibold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer ${
-                              activeEndingTab === s.name
+                            className={`px-5 py-3 font-semibold text-sm flex items-center gap-2 border-b-2 transition-all cursor-pointer ${activeEndingTab === s.name
                                 ? "border-purple-500 text-purple-400 bg-purple-500/5"
                                 : "border-transparent text-slate-400 hover:text-slate-300 hover:border-slate-700"
-                            }`}
+                              }`}
                           >
                             <span>{s.name}</span>
                             {isApplied && (
@@ -1104,9 +1101,9 @@ if (isLoading) {
                       const currentEndings = endingsCache[selectedStory.uuid] || [];
                       const currentEndingData = currentEndings.find((e) => e.style === activeEndingTab);
                       if (!currentEndingData) return null;
-                      
+
                       const isCurrentlyApplied = selectedStory.content === currentEndingData.fullStory;
-                      
+
                       return (
                         <div className="bg-slate-900/40 rounded-xl p-6 border border-slate-700/30">
                           <div className="flex justify-between items-center mb-4">
@@ -1129,12 +1126,12 @@ if (isLoading) {
                               )}
                             </div>
                           </div>
-                          
+
                           <div className="space-y-4">
                             <div className="bg-slate-950/60 p-5 rounded-xl border border-slate-800 leading-relaxed text-slate-300 text-sm md:text-base italic shadow-inner whitespace-pre-wrap">
                               <p>{currentEndingData.ending}</p>
                             </div>
-                            
+
                             <div>
                               <details className="group border border-slate-800 rounded-lg overflow-hidden bg-slate-950/20">
                                 <summary className="list-none flex items-center justify-between p-3 text-xs font-bold text-slate-400 hover:text-slate-200 cursor-pointer select-none">

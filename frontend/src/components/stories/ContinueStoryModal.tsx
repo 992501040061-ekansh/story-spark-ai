@@ -172,11 +172,10 @@ const ContinueStoryModal = ({ story, onClose }: ContinueStoryModalProps) => {
                     <div key={branch.id} className="flex items-start gap-3 ml-4">
                       <div className="flex flex-col items-center">
                         <div
-                          className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 transition-all ${
-                            branch.id === activeBranchId
+                          className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 transition-all ${branch.id === activeBranchId
                               ? "bg-cyan-400 text-slate-950 ring-2 ring-cyan-300/50"
                               : "bg-slate-700 text-slate-300"
-                          }`}
+                            }`}
                         >
                           {idx + 1}
                         </div>
@@ -187,11 +186,10 @@ const ContinueStoryModal = ({ story, onClose }: ContinueStoryModalProps) => {
                       <button
                         type="button"
                         onClick={() => handleExtendBranch(branch)}
-                        className={`flex-1 rounded-xl border p-3 text-left transition-all duration-200 ${
-                          branch.id === activeBranchId
+                        className={`flex-1 rounded-xl border p-3 text-left transition-all duration-200 ${branch.id === activeBranchId
                             ? "border-cyan-400/40 bg-cyan-400/10"
                             : "border-white/10 bg-white/5 hover:border-indigo-400/30 hover:bg-white/10"
-                        }`}
+                          }`}
                       >
                         <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">
                           Branch {idx + 1} · Depth {branch.depth}
