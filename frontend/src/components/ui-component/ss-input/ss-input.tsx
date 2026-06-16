@@ -55,18 +55,7 @@ const SSInput = <T extends FieldValues>({
           </span>
         )}
 
-       <input
-  type={inputType}
-  id={name}
-  className={`w-full min-w-0 max-w-full box-border pl-8 pr-10 py-1.5 text-base text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 bg-white dark:bg-slate-800 border-0 sm:text-sm ${
-    error
-      ? "outline-red-500"
-      : "outline-gray-800 focus:outline-indigo-600"
-  }`}
-  placeholder={placeholder}
-  autoComplete={autoComplete}
-  {...register(name, validation)}
-/>
+
 
         <input
   type={inputType}
