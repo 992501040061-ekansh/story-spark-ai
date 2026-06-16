@@ -3,15 +3,15 @@ import { io, Socket } from "socket.io-client";
 import { getToken } from "../services/auth.service";
 import { resolveSocketUrl } from "../helpers/socket-url";
 
-let socketIoInstance: Socket | null = null;
+export let socketIo: Socket | null = null;
 
 export const getSocketIo = (): Socket | null => {
-  return socketIoInstance;
+  return socketIo;
 };
 
 export const connectSocket = (): Socket | null => {
-  if (socketIoInstance && socketIoInstance.connected) {
-    return socketIoInstance;
+  if (socketIo && socketIo.connected) {
+    return socketIo;
   }
 
   const socketUrl = resolveSocketUrl();
@@ -26,7 +26,7 @@ export const connectSocket = (): Socket | null => {
     return null;
   }
 
-  socketIoInstance = io(socketUrl, {
+  socketIo = io(socketUrl, {
     transports: ["websocket", "polling"],
     autoConnect: false,
     reconnectionAttempts: 5,
@@ -35,25 +35,25 @@ export const connectSocket = (): Socket | null => {
     withCredentials: true,
   });
 
-  socketIoInstance.on("connect", () => {
+  socketIo.on("connect", () => {
     console.log("[Story Spark] Socket.IO connected");
   });
 
-  socketIoInstance.on("disconnect", () => {
+  socketIo.on("disconnect", () => {
     console.log("[Story Spark] Socket.IO disconnected");
   });
 
-  socketIoInstance.on("connect_error", (error: any) => {
+  socketIo.on("connect_error", (error: any) => {
     console.warn("[Story Spark] Socket.IO connection error:", error);
   });
 
-  socketIoInstance.connect();
-  return socketIoInstance;
+  socketIo.connect();
+  return socketIo;
 };
 
 export const disconnectSocket = (): void => {
-  if (socketIoInstance && socketIoInstance.connected) {
-    socketIoInstance.disconnect();
-    socketIoInstance = null;
+  if (socketIo && socketIo.connected) {
+    socketIo.disconnect();
+    socketIo = null;
   }
 };

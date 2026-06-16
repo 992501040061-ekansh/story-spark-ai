@@ -89,6 +89,30 @@ async function main() {
       if (userId) {
         socket.join(`user:${userId}`);
       }
+
+      socket.on("reauthenticate", (newToken: string) => {
+        try {
+          const verifiedUser = JwtHelpers.verifyToken(
+            newToken,
+            config.jwt.secret as Secret
+          );
+          const newUserId =
+            verifiedUser._id || verifiedUser.userId || verifiedUser.sub || verifiedUser.id;
+          if (!newUserId) {
+            throw new Error("Unauthorized");
+          }
+
+          const normalizedUserId = newUserId.toString();
+          const previousUserId = socket.data.userId as string | undefined;
+          if (previousUserId && previousUserId !== normalizedUserId) {
+            socket.leave(`user:${previousUserId}`);
+          }
+          socket.data.userId = normalizedUserId;
+          socket.join(`user:${normalizedUserId}`);
+        } catch (error) {
+          socket.emit("auth_error", "Invalid token");
+        }
+      });
     });
 
     httpServer.listen(config.port, () => {
