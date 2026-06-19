@@ -8,10 +8,9 @@ interface ProtectedRouteProps {
 }
 
 /**
- * SimpleProtectedRoute Component
+ * ProtectedRoute Component
  * Guards a route by verifying the stored token is present, decodable,
- * and not past its `exp` claim. Redirects to /login immediately when
- * any check fails.
+ * and checks the user's role if allowedRoles is provided.
  */
 export const hasAllowedRole = (userRole: string, allowedRoles?: string[]) => {
   if (!allowedRoles || allowedRoles.length === 0) {
@@ -24,20 +23,21 @@ export const hasAllowedRole = (userRole: string, allowedRoles?: string[]) => {
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const location = useLocation();
 
-  // isLoggedIn reads the token from localStorage, decodes it with
-  // jwtDecode, and returns false if the token is missing, malformed,
-  // or if Date.now() is past the `exp` claim.
   if (!isLoggedIn()) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   const user = getUserInfo();
 
-  if (!user || !hasAllowedRole(user.role, allowedRoles)) {
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  if (!hasAllowedRole(user.role, allowedRoles)) {
     return <Navigate to="/" replace state={{ from: location.pathname }} />;
   }
 
-  return <>{children || <Outlet />}</>;
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default ProtectedRoute;
