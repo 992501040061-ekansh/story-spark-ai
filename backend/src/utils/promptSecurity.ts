@@ -4,6 +4,7 @@
  * - Input normalization before pattern matching
  * - Expanded forbidden patterns covering rephrased/obfuscated attacks
  * - Unicode normalization to prevent character substitution bypasses
+ * - Content moderation on both input and output
  * - Improved output validation
  */
 
@@ -70,6 +71,9 @@ export const validateAndFormatPrompt = (userPrompt: string): string => {
     }
   }
 
+  // Content moderation — block harmful/inappropriate input
+  assertContentSafe(normalizedPrompt);
+
   // Strict delimiters to isolate user input
   return `"""\n${normalizedPrompt}\n"""`;
 };
@@ -81,7 +85,7 @@ export const validateOutput = (aiResponse: string): string => {
 
   const lowerResponse = aiResponse.toLowerCase();
 
-  // Expanded output validation
+  // Expanded output validation — check for leaked system instructions
   const leakPatterns = [
     "system prompt:",
     "instructions:",
@@ -99,6 +103,9 @@ export const validateOutput = (aiResponse: string): string => {
       throw new Error("Security Violation: AI output leaked system instructions.");
     }
   }
+
+  // Content moderation — block harmful/inappropriate output
+  assertContentSafe(aiResponse);
 
   return aiResponse;
 };
