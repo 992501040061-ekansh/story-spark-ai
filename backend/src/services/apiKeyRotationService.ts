@@ -30,7 +30,9 @@ function loadKeys(): string[] {
 
   // Backward-compat fallbacks (single-key setups)
   const fallback =
+    process.env.OPEN_AI_KEY ??
     process.env.OPENAI_API_KEY ??
+    process.env.GEMINI_API_KEY ??
     process.env.GOOGLE_GEMINI_API_KEY ??
     "";
 
@@ -48,7 +50,7 @@ export function getNextApiKey(): string {
     throw new Error(
       "[apiKeyRotationService] No AI API keys found.\n" +
       "Set AI_API_KEYS=key1,key2,key3 in your .env file.\n" +
-      "Or set OPENAI_API_KEY / GOOGLE_GEMINI_API_KEY for single-key mode."
+      "Or set OPEN_AI_KEY / GEMINI_API_KEY for single-key mode."
     );
   }
 
