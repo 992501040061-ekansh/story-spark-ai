@@ -1,4 +1,4 @@
-import { useForm, SubmitHandler } from "react-hook-form";
+﻿import { useForm, SubmitHandler } from "react-hook-form";
 import SSInput from "../ui-component/ss-input/ss-input";
 import SSButton from "../ui-component/ss-button/ss-button";
 import { useState, useEffect } from "react";
@@ -321,10 +321,15 @@ const otpPayload = {
   to="/"
   className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition-colors duration-200 hover:text-blue-400"
 >
-  <span>←</span>
+  <span>ΓåÉ</span>
   <span>Back to Home</span>
 </Link>
           <h3 className="text-center text-xl sm:text-2xl font-bold tracking-tight text-slate-200">
+        {/* Card */}
+        <div className="bg-white dark:bg-slate-800/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 sm:p-8 shadow-2xl w-full min-w-0 overflow-hidden box-border">
+
+          <h3 className="text-center text-xl sm:text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-200">
+
             {showOtpField ? "Verify Your Email" : "Create Account"}
           </h3>
           {showOtpField && registerInfo && (
@@ -346,8 +351,7 @@ const otpPayload = {
               Join StorySparkAI and begin your creative journey.
             </p>
           )}
-          {/* Card */}
-          <div className="bg-white dark:bg-slate-800/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 sm:p-8 shadow-2xl w-full min-w-0 overflow-hidden box-border">
+
           {!showOtpField && (
             <div className="relative mb-6 w-full box-border">
               <div className="absolute inset-0 flex items-center">
@@ -425,10 +429,6 @@ const otpPayload = {
                     {PASSWORD_REQUIREMENTS.map(({ key, label }) => {
                       const met = passwordChecks[key];
                       return (
-                        <li key={key} className={`flex items-center gap-2 ${met ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"}`}>
-                          <span className={`inline-flex h-4 w-4 items-center justify-center rounded-full border ${met ? "border-emerald-500 bg-emerald-500/10" : "border-slate-300 dark:border-slate-600"}`}>
-                            {met ? "✓" : "•"}
-                          </span>
                           <span>{label}</span>
                         </li>
                       );

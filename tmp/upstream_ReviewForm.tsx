@@ -47,47 +47,62 @@ const StarRating: React.FC<StarRatingProps> = ({ rating, setRating }) => {
     [rating, setRating]
   );
 
-  return (
-    <div>
-      <div
-        role="radiogroup"
-        aria-label="Star rating"
-        tabIndex={0}
-        onKeyDown={handleKey}
-        className="flex items-center gap-2"
-      >
-        {[1, 2, 3, 4, 5].map((star) => {
-          const filled = star <= (hovered || rating);
-          return (
-            <button
-              key={star}
-              type="button"
-              role="radio"
-              aria-checked={rating === star}
-              aria-label={`${star} star${star > 1 ? "s" : ""}`}
-              onClick={() => setRating(star)}
-              onMouseEnter={() => setHovered(star)}
-              onMouseLeave={() => setHovered(0)}
-              className={`text-2xl transition-all duration-150 focus-visible:outline-none rounded-md px-1 ${
-                filled
-                  ? "text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.7)] scale-110"
-                  : "text-gray-300 dark:text-gray-600 hover:text-yellow-300"
-              }`}
-            >
-              ★
-            </button>
-          );
-        })}
-      </div>
-
-      {(hovered || rating) > 0 && (
-        <p className="mt-1 text-xs font-medium text-yellow-400">{ratingLabels[hovered || rating]}</p>
   const renderStarIcon = (index: number) => {
-    // index is 1..5
     if (rating >= index) return <i className="fa-solid fa-star" />;
     if (rating >= index - 0.5) return <i className="fa-solid fa-star-half-stroke" />;
     return <i className="fa-regular fa-star" />;
   };
+
+  const handleClick = (value: number) => {
+    setRating(value);
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-2">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <div
+            key={star}
+            className="relative text-3xl text-gray-600 hover:scale-105 transition-all duration-150"
+            onMouseLeave={() => setHovered(0)}
+          >
+            <div
+              className={`flex items-center justify-center w-8 h-8 ${
+                star <= Math.ceil(hovered || rating) ? "text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.7)]" : "text-gray-600"
+              }`}
+            >
+              {renderStarIcon(star)}
+            </div>
+
+            {/* left half (0.5) */}
+            <button
+              type="button"
+              aria-label={`Rate ${star - 0.5} stars`}
+              onMouseEnter={() => setHovered(star - 0.5)}
+              onClick={() => handleClick(star - 0.5)}
+              className="absolute left-0 top-0 h-full w-1/2 bg-transparent"
+            />
+
+            {/* right half (full star) */}
+            <button
+              type="button"
+              aria-label={`Rate ${star} stars`}
+              onMouseEnter={() => setHovered(star)}
+              onClick={() => handleClick(star)}
+              className="absolute right-0 top-0 h-full w-1/2 bg-transparent"
+            />
+          </div>
+        ))}
+      </div>
+
+      {(hovered || rating) > 0 && (
+        <p className="text-xs font-semibold tracking-wide text-yellow-400">
+          {ratingLabels[Math.round(hovered || rating) || 0]}
+        </p>
+      )}
+    </div>
+  );
+};
 
   const handleClick = (value: number) => {
     setRating(value);
@@ -148,6 +163,15 @@ const ReviewForm: React.FC = () => {
   const [isDark, setIsDark] = useState(false);
 
   const [createReview, { isLoading }] = useCreateReviewMutation();
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!name.trim()) newErrors.name = "Name is required";
+    if (!role.trim()) newErrors.role = "Role is required";
+    if (!feedback.trim()) newErrors.feedback = "Review is required";
+    if (feedback.length > 500) newErrors.feedback = "Max 500 characters";
+    if (rating < 0.5) newErrors.rating = "Please select a rating";
 
   const validate = useCallback(() => {
     const newErrors: Record<string, string> = {};
