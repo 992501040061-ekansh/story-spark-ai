@@ -1,8 +1,15 @@
-import React, { lazy, Suspense } from "react";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-
-import { USER_ROLE } from "./constants/role";
-
+import React from "react";
+import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
+import StoryInspirationWrapper from "./components/StoryInspirationWrapper";
+import WritingAssistantComponent from "./components/writing-assistant/writing_assistant.component";
+import CollabHome from "./components/collab/CollabHome";
+import CollabRoom from "./components/collab/CollabRoom";
+import HeroSectionComponent from "./components/hero/hero_section.component";
+import HomeComponent from "./components/home/home.component";
+import LoginComponent from "./components/login/login.component";
+import SignUpComponent from "./components/signup/signup.component";
+import DashboardComponent from "./components/dashboard/dashboard.component";
 import RootLayout from "./components/layout/root_layout.component";
 import DashboardLayout from "./components/dashboard/dashboard_layout.component";
 import LoadingAnimation from "./components/loading/loading.component";
@@ -32,14 +39,7 @@ import SettingComponent from "./components/dashboard/settings/settings.component
 import SignUpComponent from "./components/signup/signup.component";
 import SimpleProtectedRoute from "./components/ProtectedRoute";
 import StoriesComponent from "./components/stories/stories.component";
-import Leaderboard from "./pages/Leaderboard";
-import StoryInspirationWrapper from "./components/StoryInspirationWrapper";
-import StoryWorkspace from "./components/story/StoryWorkspace";
-import TemplatesComponent from "./components/templates/templates.component";
-import Terms from "./components/footer/terms.tsx";
-import UserComponent from "./components/dashboard/users/user.component";
-import WriterApplicationComponent from "./components/dashboard/writers/writer_application.component";
-import WritingAssistantComponent from "./components/writing-assistant/writing_assistant.component";
+import ChatPage from "./components/chat/ChatPage";
 
 type ProtectedRouteProps = {
   allowedRoles: string[];
@@ -137,8 +137,7 @@ const router = createBrowserRouter([
       { path: "leaderboard", element: <Leaderboard /> },
       { path: "community", element: <CommunityComponent /> },
       { path: "report-bug", element: <ReportBug /> },
-      { path: "search", element: lazyPage(<SearchPageComponent />) },
-      { path: "chat", element: lazyPage(<ChatPage />) },
+      { path: "chat", element: <ChatPage /> },
       {
         element: <ProtectedRoute allowedRoles={ALL_ROLES} />,
         children: [
