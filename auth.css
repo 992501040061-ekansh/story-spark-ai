@@ -254,7 +254,11 @@ body::after {
 .ds-input-group {
     position: relative;
     width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
 }
+
+
 
 .ds-input-icon {
     position: absolute;
