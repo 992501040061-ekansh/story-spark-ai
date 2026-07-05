@@ -18,7 +18,7 @@ const app: Application = express();
 app.set("trust proxy", 1);
 app.use(helmet());
 
-export const defaultCorsOrigins =
+const defaultCorsOrigins =
   process.env.NODE_ENV === "development"
     ? ["http://localhost:4001", "http://localhost:4002"]
     : ["https://storysparkai.vercel.app"];
