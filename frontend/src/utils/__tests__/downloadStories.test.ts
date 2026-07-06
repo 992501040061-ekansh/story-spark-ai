@@ -4,6 +4,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { downloadTXT } from "../downloadStories";
 
+interface MockAnchorElement {
+  href: string;
+  download: string;
+  click: ReturnType<typeof vi.fn>;
+  style: { display: string };
+  setAttribute: ReturnType<typeof vi.fn>;
+  appendChild: ReturnType<typeof vi.fn>;
+  removeChild: ReturnType<typeof vi.fn>;
+}
+
+interface Story {
+  title: string;
+  prompt: string;
+  content: string;
+  generatedAt: Date;
+}
+
 const mockCreateObjectURL = vi.fn(() => "blob:mock-url-123");
 const mockRevokeObjectURL = vi.fn();
 const mockClick = vi.fn();
@@ -18,15 +35,23 @@ beforeEach(() => {
   URL.createObjectURL = mockCreateObjectURL;
   URL.revokeObjectURL = mockRevokeObjectURL;
 
-  const mockLink = {
-    href: "",
-    download: "",
-    click: mockClick,
-  } as unknown as HTMLAnchorElement;
-
   mockCreateObjectURL.mockReturnValue("blob:mock-url-123");
 
-  vi.spyOn(document, "createElement").mockReturnValue(mockLink as any);
+  vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
+    if (tag === "a") {
+      return {
+        href: "",
+        download: "",
+        click: mockClick,
+        style: { display: "" },
+        setAttribute: vi.fn(),
+        appendChild: mockAppendChild,
+        removeChild: mockRemoveChild,
+      } as unknown as MockAnchorElement;
+    }
+    return originalCreateObjectURL as unknown as Element;
+  });
+
   vi.spyOn(document.body, "appendChild").mockImplementation(mockAppendChild);
   vi.spyOn(document.body, "removeChild").mockImplementation(mockRemoveChild);
 });
@@ -38,7 +63,7 @@ afterEach(() => {
 
 describe("downloadTXT", () => {
   it("creates a blob with text/plain mime type", () => {
-    const story = {
+    const story: Story = {
       title: "My Story",
       prompt: "Once upon a time",
       content: "There was a hero.",
@@ -51,21 +76,21 @@ describe("downloadTXT", () => {
       return "blob:mock-url-123";
     });
 
-    downloadTXT(story as any);
+    downloadTXT(story);
 
     expect(capturedBlob).not.toBeNull();
     expect(capturedBlob!.type).toBe("text/plain");
   });
 
   it("creates object URL from the blob", () => {
-    const story = {
+    const story: Story = {
       title: "Test Title",
       prompt: "A prompt",
       content: "Story content",
       generatedAt: new Date(),
     };
 
-    downloadTXT(story as any);
+    downloadTXT(story);
 
     expect(mockCreateObjectURL).toHaveBeenCalledOnce();
     const blobArg = mockCreateObjectURL.mock.calls[0][0] as Blob;
@@ -73,33 +98,33 @@ describe("downloadTXT", () => {
   });
 
   it("creates and clicks a download link", () => {
-    const story = {
+    const story: Story = {
       title: "Download Test",
       prompt: "Test prompt",
       content: "Test content",
       generatedAt: new Date(),
     };
 
-    downloadTXT(story as any);
+    downloadTXT(story);
 
     expect(mockClick).toHaveBeenCalledOnce();
   });
 
   it("revokes the object URL after click", () => {
-    const story = {
+    const story: Story = {
       title: "Cleanup Test",
       prompt: "Prompt",
       content: "Content",
       generatedAt: new Date(),
     };
 
-    downloadTXT(story as any);
+    downloadTXT(story);
 
     expect(mockRevokeObjectURL).toHaveBeenCalledWith("blob:mock-url-123");
   });
 
   it("formats story fields into the blob content", async () => {
-    const story = {
+    const story: Story = {
       title: "My Title",
       prompt: "A dragon story",
       content: "The dragon flew away.",
@@ -114,7 +139,7 @@ describe("downloadTXT", () => {
       return "blob:mock-url-123";
     });
 
-    downloadTXT(story as any);
+    downloadTXT(story);
 
     // Give the async blob.text() a moment to resolve
     await new Promise((resolve) => setTimeout(resolve, 10));
@@ -124,36 +149,19 @@ describe("downloadTXT", () => {
     expect(capturedContent).toContain("Story: The dragon flew away.");
   });
 
-  it("sanitizes title for download filename by replacing invalid chars", () => {
-    const story = {
+  it("handles a title with special characters without throwing", () => {
+    const story: Story = {
       title: "Test: Story/With*Invalid?Chars",
       prompt: "prompt",
       content: "content",
       generatedAt: new Date(),
     };
 
-    let capturedFilename = "";
-    vi.spyOn(document, "createElement").mockImplementation((tag: string) => {
-      if (tag === "a") {
-        return {
-          click: mockClick,
-          href: "",
-          download: "",
-          style: { display: "" },
-          setAttribute: vi.fn(),
-          appendChild: vi.fn(),
-          removeChild: vi.fn(),
-        } as unknown as HTMLAnchorElement;
-      }
-      return originalCreateObjectURL as any;
-    });
-
-    // We verify the function handles the title without throwing
-    expect(() => downloadTXT(story as any)).not.toThrow();
+    expect(() => downloadTXT(story)).not.toThrow();
   });
 
   it("uses toLocaleString for the generated date", async () => {
-    const story = {
+    const story: Story = {
       title: "Date Test",
       prompt: "p",
       content: "c",
@@ -168,11 +176,10 @@ describe("downloadTXT", () => {
       return "blob:mock-url-123";
     });
 
-    downloadTXT(story as any);
+    downloadTXT(story);
 
     await new Promise((resolve) => setTimeout(resolve, 10));
 
-    // toLocaleString produces output containing the word "Generated:" and a date
     expect(capturedContent).toContain("Generated:");
     expect(capturedContent).toMatch(/Generated: .+/);
   });
