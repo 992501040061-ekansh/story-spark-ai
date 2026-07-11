@@ -12,6 +12,7 @@ import CharacterNetwork from "../CharacterNetwork";
 import StoryCoverGenerator from "../cover-generator/StoryCoverGenerator";
 import StoryChecklist from "../checklist/StoryChecklist";
 import StoryRewritePanel from "../rewrite/StoryRewritePanel";
+import StoryBranchingEditor from "../branching/StoryBranchingEditor";
 
 import {
   getSafeFileName,
@@ -253,6 +254,10 @@ const StoryWorkspace = () => {
       ?.map((chapter) => chapter.content)
       .join("\n\n") || ""
   }
+/>
+
+<StoryBranchingEditor
+  storyTitle={currentStory.title}
 />
 
   <StoryViewer
