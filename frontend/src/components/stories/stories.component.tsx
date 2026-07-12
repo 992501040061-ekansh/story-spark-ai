@@ -42,11 +42,10 @@ type Inputs = {
 };
 
 const MAX_PROMPT_LENGTH = 2000;
-const WARN_THRESHOLD = 0.85;
 const lengths = ["short", "medium", "long"] as const;
 
 const StoriesComponent = () => {
-const WARN_THRESHOLD = 0.8;
+const WARN_THRESHOLD = 0.85;
 const DANGER_THRESHOLD = 0.95;
 
 const LANGUAGES = [
