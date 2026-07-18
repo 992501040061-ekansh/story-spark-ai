@@ -14,6 +14,18 @@ import StoryChecklist from "../checklist/StoryChecklist";
 import StoryRewritePanel from "../rewrite/StoryRewritePanel";
 import StoryBranchingEditor from "../branching/StoryBranchingEditor";
 import PlotHoleDetector from "../plot-hole/PlotHoleDetector";
+import PacingAnalyzer from "../pacing/PacingAnalyzer";
+import OutlineQualityAnalyzer from "../outline-quality/OutlineQualityAnalyzer";
+import DialogueEnhancer from "../dialogue/DialogueEnhancer";
+import TimelineConsistencyChecker from "../timeline/TimelineConsistencyChecker";
+import GenreBlendGenerator from "../genre/GenreBlendGenerator";
+import RelationshipGraph from "../relationship/RelationshipGraph";
+import GenreWeightControls from "../genre/GenreWeightControls";
+import StoryStylePresets from "../style/StoryStylePresets";
+import StoryPerspectiveSwitcher from "../perspective/StoryPerspectiveSwitcher";
+import StoryTonePresets from "../tone/StoryTonePresets";
+import StoryAudienceSelector from "../audience/StoryAudienceSelector";
+
 
 import {
   getSafeFileName,
@@ -267,6 +279,81 @@ const StoryWorkspace = () => {
       .join("\n\n") || ""
   }
 />
+<PacingAnalyzer
+  story={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
+<OutlineQualityAnalyzer
+  outline={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
+<DialogueEnhancer
+  story={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
+<TimelineConsistencyChecker
+  story={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
+<GenreBlendGenerator
+  prompt={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
+<RelationshipGraph
+  story={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
+
+<VocabularyAnalyzer
+  story={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
+
+<GenreWeightControls />
+<StoryStylePresets />
+
+<StoryPerspectiveSwitcher
+  story={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
+<StoryTonePresets
+  story={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
+<StoryAudienceSelector
+  prompt={
+    currentStory.chapters
+      ?.map((chapter) => chapter.content)
+      .join("\n\n") || ""
+  }
+/>
 
   <StoryViewer
     chapters={currentStory.chapters}
@@ -279,7 +366,14 @@ const StoryWorkspace = () => {
   </div>
 </>
         ) : (
-          <CharacterNetwork storyId={currentStory.id} />
+           <CharacterNetwork
+           storyId={currentStory.id}
+                       storyContent={
+             currentStory.chapters
+               ?.map((chapter) => chapter.content)
+                .join("\n\n") || ""
+            }
+          />
         )}
       </div>
     </div>
