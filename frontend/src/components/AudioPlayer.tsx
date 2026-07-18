@@ -6,9 +6,10 @@ import React, {
   useMemo,
   useState,
 } from "react";
-
 import {
   AlertCircle,
+  ChevronDown,
+  ChevronUp,
   LoaderCircle,
   Pause,
   Play,
@@ -16,9 +17,11 @@ import {
   Square,
   Star,
   Volume2,
+  Volume,
 } from "lucide-react";
 
 import { useSpeechSynthesis } from "../hooks/useSpeechSynthesis";
+import { useVoicePreview } from "../hooks/useVoicePreview";
 import { useVoiceFavorites } from "../hooks/useVoiceFavorites";
 
 export type NarrationPlaybackState = "idle" | "playing" | "paused";
@@ -75,10 +78,12 @@ const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
     }, [voiceGender]);
 
     const speech = useSpeechSynthesis(text, voiceGender);
+    const preview = useVoicePreview();
     const favorites = useVoiceFavorites();
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-    const actualTotalWords = useMemo(() => getWordCount(text), [text]);
 
+    // ✅ FIX: Calculate actual word count from story text
+    const actualTotalWords = useMemo(() => getWordCount(text), [text]);
     const speedSelectId = useId();
     const voiceGenderSelectId = useId();
     const languageSelectId = useId();
@@ -127,11 +132,8 @@ const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
           speech.setSelectedVoiceId(displayedVoices[0].id);
         }
       }
-    }, [
-      showFavoritesOnly,
-      displayedVoices,
-      speech.selectedVoiceId,
-    ]);
+    }, [showFavoritesOnly, displayedVoices, speech.selectedVoiceId]);
+
     useEffect(() => {
       const handleKeyDown = (event: KeyboardEvent) => {
         const target = event.target as HTMLElement;
@@ -178,6 +180,20 @@ const AudioPlayer = forwardRef<AudioPlayerHandle, AudioPlayerProps>(
         window.removeEventListener("keydown", handleKeyDown);
       };
     }, [speech.isPlaying, speech.isPaused, speech.rate, speech.pause, speech.resume, speech.play, speech.setRate]);
+
+     const scrollToTop = () => {
+      const container = document.querySelector('[role="region"]');
+      if (container) {
+        container.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    const scrollToBottom = () => {
+      const container = document.querySelector('[role="region"]');
+      if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }
+    };
 
     const isLoading = speech.isSupported && !speech.isReady;
     const canNarrate = speech.isSupported && speech.isReady && text.trim().length > 0;
